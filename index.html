@@ -1897,19 +1897,18 @@
             await State.load();
         });
 
-        // 1. Enforce 12-transaction cap in UI.openTxModal:
-openTxModal(txId = null) {
-    if (!txId && State.transactions.length >= 12) {
-        alert("Demo limit reached (12 transactions). Download the standalone file for unlimited offline tracking.");
-        return;
-    }
-    // ... rest of existing modal code
-}
-
-// 2. Intercept Export Backup:
-Backup.exportFile = function() {
-    alert("Data export is disabled in the preview demo. Get the complete standalone file to backup and restore anytime.");
-};
+        const DEMO_TX_LIMIT = 20;
+        const originalOpenTxModal = UI.openTxModal.bind(UI);
+        UI.openTxModal = function (txId = null) {
+            if (!txId && State.transactions.length >= DEMO_TX_LIMIT) {
+                alert(`Demo limit reached (${DEMO_TX_LIMIT} transactions). Download the standalone file for unlimited offline tracking.`);
+                return;
+            }
+            return originalOpenTxModal(txId);
+        };
+        Backup.exportFile = function () {
+            alert("Data export is disabled in the preview demo. Get the complete standalone file to backup and restore anytime.");
+        };
     </script>
 </body>
 </html>
