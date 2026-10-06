@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline Budget OS — Live Interactive Demo</title>
+    <title>Offline Budget OS — Interactive Demo</title>
     <style>
         :root {
             --bg-canvas: #0a0a0a;
@@ -588,10 +588,10 @@
 <body>
     <div class="demo-bar">
         <div class="flex items-center">
-            <span class="demo-badge">LIVE DEMO</span>
-            <span class="text-secondary">Offline Budget OS client-side preview with sample ledger records.</span>
+            <span class="demo-badge">INTERACTIVE DEMO</span>
+            <span class="text-secondary">Sample data · No bank connection · Changes stay in this browser.</span>
         </div>
-        <a href="https://tyrellroberts7.gumroad.com/l/mfpqks" target="_blank" rel="noopener noreferrer" class="demo-cta">Get Turnkey File ($10)</a>
+        <a href="https://tyrellroberts7.gumroad.com/l/mfpqks" target="_blank" rel="noopener noreferrer" class="demo-cta">Get Full Version ($10)</a>
     </div>
 
     <nav class="top-nav">
@@ -612,7 +612,7 @@
                         <svg class="icon-sun hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                         <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                     </button>
-                    <button type="button" class="btn btn-outline" onclick="UI.openModal('modal-import')">
+                    <button type="button" class="btn btn-outline" onclick="UI.openModal('modal-import')" title="CSV import is unavailable in this demo">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                         Import CSV
                     </button>
@@ -708,7 +708,7 @@
     </main>
 
     <footer class="container text-xs text-secondary text-center py-6">
-        Offline Budget OS Live Demo. Data persists locally in browser memory.
+        Interactive demo with sample data. Changes are saved only in this browser and are not sent to a server. Do not enter real financial information.
     </footer>
 
     <div class="modal-overlay" id="modal-txn" role="dialog" aria-modal="true" aria-labelledby="modal-txn-title">
@@ -748,12 +748,9 @@
                 <button type="button" class="btn-icon" onclick="UI.closeModals()" aria-label="Close import dialog"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
             <div class="modal-body" id="import-step-1">
-                <div class="drop-zone" id="csv-drop-zone">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" class="mb-4 mx-auto" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    <p class="font-semibold mb-1">Select or drop a CSV file</p>
-                    <p class="text-xs text-secondary">Works with bank exports that have Date, Description and Amount columns.</p>
-                    <input type="file" id="csv-file-input" accept=".csv" class="hidden" aria-label="Choose CSV file">
-                    <button type="button" class="btn btn-outline mt-4" onclick="document.getElementById('csv-file-input').click()">Browse Files</button>
+                <div class="text-center py-6" id="csv-drop-zone">
+                    <p class="font-semibold mb-1">CSV import is unavailable in this demo</p>
+                    <p class="text-xs text-secondary">CSV import is not available in this demo. Sample ledger records are provided; the demo does not connect to bank accounts.</p>
                 </div>
             </div>
             <div class="modal-body hidden" id="import-step-2">
@@ -802,10 +799,9 @@
                     <p class="text-sm text-secondary mt-2" id="storage-status"></p>
                     <p class="text-xs text-secondary mt-2" id="backup-status"></p>
                     <div class="flex gap-2 mt-3">
-                        <button type="button" class="btn btn-outline flex-1" onclick="Backup.exportFile()">Export Backup</button>
-                        <button type="button" class="btn btn-outline flex-1" onclick="document.getElementById('backup-file-input').click()">Restore Backup</button>
+                        <button type="button" class="btn btn-outline flex-1" disabled>Export Backup (Full Version)</button>
+                        <button type="button" class="btn btn-outline flex-1" disabled>Restore Backup (Full Version)</button>
                     </div>
-                    <input type="file" id="backup-file-input" accept=".json,application/json" class="hidden" aria-label="Choose backup file">
                 </div>
                 <div>
                     <h4 class="font-semibold mb-2 border-b pb-2 text-danger">Danger Zone</h4>
@@ -1694,11 +1690,9 @@
                 if (!categoryContainer || !rulesContainer) return;
 
                 const storageStatus = byId("storage-status");
-                if (storageStatus) {
-                    storageStatus.textContent = "Interactive demo mode: Running locally in client-side storage.";
-                }
+                if (storageStatus) storageStatus.textContent = "Demo changes are saved only in this browser. No bank is connected, and demo data is not sent to a server. Do not enter real financial information.";
                 const backupStatus = byId("backup-status");
-                if (backupStatus) backupStatus.textContent = "Data persists in this browser session.";
+                if (backupStatus) backupStatus.textContent = "Use Reset Demo Data to restore the original sample data.";
 
                 categoryContainer.innerHTML = State.categories.map((category) => `
                     <div class="flex items-center gap-2 mb-2">
@@ -1857,10 +1851,13 @@
                 `;
             },
             async processMapping() {
-                alert("CSV mapping processed. Demo version will reset on page reload.");
+                alert("CSV import is not available in this demo. No data was imported.");
                 UI.closeModals();
             },
-            async executeImport() { UI.closeModals(); }
+            async executeImport() {
+                alert("CSV import is not available in this demo. No data was imported.");
+                UI.closeModals();
+            }
         };
 
         const Drafts = {
