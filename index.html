@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Budget Tracker — Interactive Read-Only Demo</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #34d399;
+      --red: #f87171;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .banner {
+      background-color: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .banner p {
+      font-size: 0.9rem;
+      color: #bae6fd;
+    }
+    .cta-btn {
+      background-color: var(--accent);
+      color: #0f172a;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 6px;
+      text-decoration: none;
+      white-space: nowrap;
+      font-size: 0.875rem;
+    }
+    .cta-btn:hover { opacity: 0.9; }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    .card h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .card .val {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .income { color: var(--green); }
+    .expenses { color: var(--red); }
+    .net { color: var(--accent); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+    th {
+      padding: 12px 16px;
+      background-color: rgba(51, 65, 85, 0.4);
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: #334155;
+    }
+    .locked-notice {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-align: center;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="banner">
+      <div>
+        <strong>Interactive Preview Mode</strong>
+        <p>This is a live static demonstration running client-side with mock ledger data.</p>
+      </div>
+      <a href="https://tyrellroberts7.gumroad.com/l/mfpqks" target="_blank" rel="noopener noreferrer" class="cta-btn">Get Turnkey Version ($10)</a>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="card">
+        <h3>Total Monthly Inflow</h3>
+        <div class="val income" id="total-income">$0.00</div>
+      </div>
+      <div class="card">
+        <h3>Total Fixed & Variable Outflow</h3>
+        <div class="val expenses" id="total-expenses">$0.00</div>
+      </div>
+      <div class="card">
+        <h3>Net Monthly Savings</h3>
+        <div class="val net" id="net-savings">$0.00</div>
+      </div>
+      <div class="card">
+        <h3>Savings Rate</h3>
+        <div class="val" id="savings-rate">0%</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th style="text-align: right;">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="tx-table-body"></tbody>
+      </table>
+    </div>
+
+    <div class="locked-notice">
+      Database persistence and export capabilities are disabled in demo mode.
+    </div>
+  </div>
+
+  <script>
+    const mockLedger = [
+      { date: "2026-10-01", desc: "Monthly Salary / Consulting", cat: "Income", type: "income", amount: 6250.00 },
+      { date: "2026-10-02", desc: "Mortgage / Housing Allocation", cat: "Housing", type: "expense", amount: 2150.00 },
+      { date: "2026-10-03", desc: "Automotive Fuel & Maintenance", cat: "Transport", type: "expense", amount: 145.20 },
+      { date: "2026-10-03", desc: "High-Protein Grocery Run", cat: "Food", type: "expense", amount: 210.45 },
+      { date: "2026-10-04", desc: "Municipal Water & Power", cat: "Utilities", type: "expense", amount: 165.80 },
+      { date: "2026-10-05", desc: "Broadband Internet Service", cat: "Utilities", type: "expense", amount: 79.99 }
+    ];
+
+    function renderDashboard() {
+      let income = 0;
+      let expenses = 0;
+      const tbody = document.getElementById("tx-table-body");
+      tbody.innerHTML = "";
+
+      mockLedger.forEach(item => {
+        if (item.type === "income") income += item.amount;
+        else expenses += item.amount;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.date}</td>
+          <td>${item.desc}</td>
+          <td><span class="badge">${item.cat}</span></td>
+          <td style="color: ${item.type === 'income' ? 'var(--green)' : 'var(--red)'}; text-transform: capitalize;">${item.type}</td>
+          <td style="text-align: right; font-variant-numeric: tabular-nums;">
+            ${item.type === 'income' ? '+' : '-'}$${item.amount.toFixed(2)}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const net = income - expenses;
+      const rate = income > 0 ? ((net / income) * 100).toFixed(1) : 0;
+
+      document.getElementById("total-income").textContent = `$${income.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById("total-expenses").textContent = `$${expenses.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById("net-savings").textContent = `$${net.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById("savings-rate").textContent = `${rate}%`;
+    }
+
+    renderDashboard();
+  </script>
+</body>
+</html>
